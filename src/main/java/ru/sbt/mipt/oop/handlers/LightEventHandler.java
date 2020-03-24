@@ -9,26 +9,30 @@ import static ru.sbt.mipt.oop.constants.SensorEventType.LIGHT_ON;
 
 public class LightEventHandler {
     public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
-        Light light = findLight(smartHome, event);
-
         if (event.getType() == LIGHT_ON) {
-            light.setOn(true);
-            System.out.println("Light " + light.getId() + " in room " + " was turned on.");
+            changeState(smartHome, event, true);
         } else {
-            light.setOn(false);
-            System.out.println("Light " + light.getId() + " in room " + " was turned off.");
+            changeState(smartHome, event, false);
         }
     }
 
-    private static Light findLight(SmartHome smartHome, SensorEvent event) throws Exception {
-        for (Room room : smartHome.getRooms()) {
-            for (Light light : room.getLights()) {
-                if (light.getId().equals(event.getObjectId())) {
-                    return light;
-                }
+    private static void changeState(SmartHome smartHome, SensorEvent event, boolean on) {
+        smartHome.execute(component -> {
+            if (component instanceof Room) {
+                Room room = (Room) component;
+                room.execute(roomComponent -> {
+                    if (roomComponent instanceof Light) {
+                        Light light = (Light) roomComponent;
+                        if (light.getId().equals(event.getObjectId())) {
+                            light.setOn(on);
+                            System.out.println("light " + light.getId() + " was turned "
+                                    + (on ? "on." : "off."));
+                        }
+                    }
+                });
             }
-        }
-        throw new Exception("No light with this ID");
+        });
     }
+
 
 }

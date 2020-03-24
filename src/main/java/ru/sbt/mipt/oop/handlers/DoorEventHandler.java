@@ -9,25 +9,29 @@ import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_OPEN;
 
 public class DoorEventHandler {
     public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
-        Door door = findDoor(smartHome, event);
-
         if (event.getType() == DOOR_OPEN) {
-            door.setOpen(true);
-            System.out.println("Door " + door.getId() + " was opened.");
+            changeState(smartHome, event, true);
         } else {
-            door.setOpen(false);
-            System.out.println("Door " + door.getId() + " was closed.");
+            changeState(smartHome, event, false);
         }
     }
 
-    private static Door findDoor(SmartHome smartHome, SensorEvent event) throws Exception {
-        for (Room room : smartHome.getRooms()) {
-            for (Door door : room.getDoors()) {
-                if (door.getId().equals(event.getObjectId())) {
-                    return door;
-                }
+    private static void changeState(SmartHome smartHome, SensorEvent event, boolean open) {
+        smartHome.execute(component -> {
+            if (component instanceof Room) {
+                Room room = (Room) component;
+                room.execute(roomComponent -> {
+                    if (roomComponent instanceof Door) {
+                        Door door = (Door) roomComponent;
+                        if (door.getId().equals(event.getObjectId())) {
+                            door.setOpen(open);
+                            System.out.println("Door " + door.getId() + " was "
+                                                       + (open ? "opened." : "closed."));
+                        }
+                    }
+                });
             }
-        }
-        throw new Exception("No light with this ID");
+        });
     }
+
 }
