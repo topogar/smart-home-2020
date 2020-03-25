@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class Application {
 
-    public static void main(String... args) throws IOException {
+    public static void main(String... args) throws Exception {
         // считываем состояние дома из файла
         SmartHomeDeserializer deserializer = new SmartHomeJsonDeserializer();
         SmartHome smartHome = deserializer.deserialize();

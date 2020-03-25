@@ -5,13 +5,16 @@ import ru.sbt.mipt.oop.components.Door;
 import ru.sbt.mipt.oop.components.Room;
 import ru.sbt.mipt.oop.components.SmartHome;
 
+import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_CLOSED;
 import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_OPEN;
 
-public class DoorEventHandler {
-    public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
+public class DoorEventHandler implements EventHandler {
+    @Override
+    public void handleEvent(SmartHome smartHome, SensorEvent event) {
         if (event.getType() == DOOR_OPEN) {
             changeState(smartHome, event, true);
-        } else {
+        }
+        if (event.getType() == DOOR_CLOSED) {
             changeState(smartHome, event, false);
         }
     }

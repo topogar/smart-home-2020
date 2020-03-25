@@ -11,8 +11,9 @@ import ru.sbt.mipt.oop.components.SmartHome;
 
 import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_CLOSED;
 
-public class HallDoorEventHandler implements EventHandler{
-    public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
+public class HallDoorEventHandler implements EventHandler {
+    @Override
+    public void handleEvent(SmartHome smartHome, SensorEvent event) {
         if (event.getType() != DOOR_CLOSED) {
             return;
         }
@@ -22,7 +23,7 @@ public class HallDoorEventHandler implements EventHandler{
 
     }
 
-    private static boolean isHallDoor(SmartHome smartHome, String objectId) throws Exception {
+    private static boolean isHallDoor(SmartHome smartHome, String objectId) {
         final boolean[] isHallDoor = {false};
         smartHome.execute(component -> {
             if (component instanceof Room) {

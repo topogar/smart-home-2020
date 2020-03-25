@@ -5,13 +5,16 @@ import ru.sbt.mipt.oop.components.Light;
 import ru.sbt.mipt.oop.components.Room;
 import ru.sbt.mipt.oop.components.SmartHome;
 
+import static ru.sbt.mipt.oop.constants.SensorEventType.LIGHT_OFF;
 import static ru.sbt.mipt.oop.constants.SensorEventType.LIGHT_ON;
 
-public class LightEventHandler {
-    public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
+public class LightEventHandler implements EventHandler{
+    @Override
+    public void handleEvent(SmartHome smartHome, SensorEvent event) {
         if (event.getType() == LIGHT_ON) {
             changeState(smartHome, event, true);
-        } else {
+        }
+        if (event.getType() == LIGHT_OFF){
             changeState(smartHome, event, false);
         }
     }
