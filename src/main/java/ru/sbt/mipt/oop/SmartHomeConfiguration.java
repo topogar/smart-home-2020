@@ -10,7 +10,6 @@ import ru.sbt.mipt.oop.handlers.*;
 import ru.sbt.mipt.oop.serialization.SmartHomeDeserializer;
 import ru.sbt.mipt.oop.serialization.SmartHomeJsonDeserializer;
 
-import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
