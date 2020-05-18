@@ -11,14 +11,17 @@ import java.util.List;
 public class EventProcessor {
 
     private final List<EventHandler> handlers;
+    private final EventGetter getter;
 
-    public EventProcessor(SmartHome smartHome) {
+    public EventProcessor(SmartHome smartHome, EventGetter getter) {
          this.handlers = Arrays.asList(new DoorEventHandler(smartHome),
                                        new LightEventHandler(smartHome),
                                        new HallDoorEventHandler(smartHome));
+         this.getter = getter
     }
+
     public void process(SmartHome smartHome) {
-        SensorEvent event = EventGetter.getNextSensorEvent();
+        SensorEvent event = this.getter.getNextSensorEvent();
 
         while (event != null) {
 
@@ -26,7 +29,7 @@ public class EventProcessor {
                 handler.handleEvent(event);
             }
 
-            event = EventGetter.getNextSensorEvent();
+            event = this.getter.getNextSensorEvent();
         }
     }
 }

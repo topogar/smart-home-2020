@@ -2,6 +2,7 @@ package ru.sbt.mipt.oop;
 
 import ru.sbt.mipt.oop.components.SmartHome;
 import ru.sbt.mipt.oop.processing.EventProcessor;
+import ru.sbt.mipt.oop.processing.EventGetter;
 import ru.sbt.mipt.oop.serialization.SmartHomeDeserializer;
 import ru.sbt.mipt.oop.serialization.SmartHomeJsonDeserializer;
 
@@ -12,7 +13,8 @@ public class Application {
         SmartHomeDeserializer deserializer = new SmartHomeJsonDeserializer("smart-home-1.js");
         SmartHome smartHome = deserializer.deserialize();
 
-        EventProcessor eventProcessor = new EventProcessor(smartHome);
+        EventGetter getter = EventGetter();
+        EventProcessor eventProcessor = new EventProcessor(smartHome, getter);
         eventProcessor.process(smartHome);
     }
 }
