@@ -10,21 +10,27 @@ import ru.sbt.mipt.oop.components.Room;
 import ru.sbt.mipt.oop.components.SmartHome;
 
 import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_CLOSED;
+import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_OPEN;
 
-public class HallDoorEventHandler implements EventHandler{
-    public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
-        if (event.getType() != DOOR_CLOSED) {
-            return;
-        }
-        if (isHallDoor(smartHome, event.getObjectId())) {
-            turnOffAllLights(smartHome);
-        }
+public class HallDoorEventHandler implements EventHandler {
 
+    private final SmartHome smartHome;
+
+    public HallDoorEventHandler(SmartHome smartHome) {
+        this.smartHome = smartHome;
     }
 
-    private static boolean isHallDoor(SmartHome smartHome, String objectId) throws Exception {
-        final boolean[] isHallDoor = {false};
-        smartHome.execute(component -> {
+    public void handleEvent(SensorEvent event) {
+        if (event.getType() == DOOR_CLOSED) {
+            handleHallDoor(event.getObjectId(), false);
+        }
+        if (event.getType() == DOOR_OPEN) {
+            handleHallDoor(event.getObjectId(), true);
+        }
+    }
+
+    private void handleHallDoor (String objectId, boolean open) {
+        this.smartHome.execute(component -> {
             if (component instanceof Room) {
                 Room room = (Room) component;
                 if (room.getName().equals("hall")) {
@@ -32,19 +38,20 @@ public class HallDoorEventHandler implements EventHandler{
                         if (roomComponent instanceof Door) {
                             Door door = (Door) roomComponent;
                             if (door.getId().equals(objectId)) {
-                                isHallDoor[0] = true;
-                                door.setOpen(false);
+                                door.setOpen(open);
+                                if (!open) {
+                                    turnOffAllLights();
+                                }
                             }
                         }
                     });
                 };
             }
         });
-       return isHallDoor[0]; // на лекции так показывалось
     }
 
-    private static void turnOffAllLights(SmartHome smartHome) {
-        for (Room homeRoom : smartHome.getRooms()) {
+    private void turnOffAllLights() {
+        for (Room homeRoom : this.smartHome.getRooms()) {
             for (Light light : homeRoom.getLights()) {
                 light.setOn(false);
                 SensorCommand command = new SensorCommand(CommandType.LIGHT_OFF, light.getId());

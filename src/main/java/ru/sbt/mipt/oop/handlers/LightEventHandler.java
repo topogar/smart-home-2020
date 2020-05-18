@@ -5,19 +5,28 @@ import ru.sbt.mipt.oop.components.Light;
 import ru.sbt.mipt.oop.components.Room;
 import ru.sbt.mipt.oop.components.SmartHome;
 
+import static ru.sbt.mipt.oop.constants.SensorEventType.LIGHT_OFF;
 import static ru.sbt.mipt.oop.constants.SensorEventType.LIGHT_ON;
 
-public class LightEventHandler {
-    public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
+public class LightEventHandler implements EventHandler{
+
+    private final SmartHome smartHome;
+
+    public LightEventHandler(SmartHome smartHome) {
+        this.smartHome = smartHome;
+    }
+
+    public void handleEvent(SensorEvent event) {
         if (event.getType() == LIGHT_ON) {
-            changeState(smartHome, event, true);
-        } else {
-            changeState(smartHome, event, false);
+            changeState(event, true);
+        }
+        if (event.getType() == LIGHT_OFF){
+            changeState(event, false);
         }
     }
 
-    private static void changeState(SmartHome smartHome, SensorEvent event, boolean on) {
-        smartHome.execute(component -> {
+    private void changeState(SensorEvent event, boolean on) {
+        this.smartHome.execute(component -> {
             if (component instanceof Room) {
                 Room room = (Room) component;
                 room.execute(roomComponent -> {
