@@ -20,10 +20,6 @@ public class Room implements Actionable {
         return lights;
     }
 
-    public Collection<Door> getDoors() {
-        return doors;
-    }
-
     public String getName() {
         return name;
     }
