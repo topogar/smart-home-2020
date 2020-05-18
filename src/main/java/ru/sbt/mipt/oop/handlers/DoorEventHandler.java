@@ -5,11 +5,28 @@ import ru.sbt.mipt.oop.components.Door;
 import ru.sbt.mipt.oop.components.Room;
 import ru.sbt.mipt.oop.components.SmartHome;
 
+import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_CLOSED;
 import static ru.sbt.mipt.oop.constants.SensorEventType.DOOR_OPEN;
 
-public class DoorEventHandler {
-    public static void handleEvent(SmartHome smartHome, SensorEvent event) throws Exception {
-        Door door = findDoor(smartHome, event);
+public class DoorEventHandler implements EventHandler {
+
+    private final SmartHome smartHome;
+
+    public DoorEventHandler(SmartHome smartHome) {
+        this.smartHome = smartHome;
+    }
+
+    public void handleEvent(SensorEvent event) {
+        if (event.getType() != DOOR_OPEN & event.getType() != DOOR_CLOSED) {
+            return;
+        }
+
+        Door door = findDoor(event);
+
+        if (door == null) {
+            System.out.println("Door not found!");
+            return;
+        }
 
         if (event.getType() == DOOR_OPEN) {
             door.setOpen(true);
@@ -20,14 +37,14 @@ public class DoorEventHandler {
         }
     }
 
-    private static Door findDoor(SmartHome smartHome, SensorEvent event) throws Exception {
-        for (Room room : smartHome.getRooms()) {
+    private Door findDoor(SensorEvent event) {
+        for (Room room : this.smartHome.getRooms()) {
             for (Door door : room.getDoors()) {
                 if (door.getId().equals(event.getObjectId())) {
                     return door;
                 }
             }
         }
-        throw new Exception("No light with this ID");
+        return null;
     }
 }

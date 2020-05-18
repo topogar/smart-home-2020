@@ -1,14 +1,31 @@
 package ru.sbt.mipt.oop.processing;
 
+import ru.sbt.mipt.oop.CommandSender;
+import ru.sbt.mipt.oop.handlers.*;
 import ru.sbt.mipt.oop.sensor.SensorEvent;
 import ru.sbt.mipt.oop.components.SmartHome;
-import ru.sbt.mipt.oop.handlers.SmartHomeEventHandler;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class EventProcessor {
-    public static void process(SmartHome smartHome) throws Exception {
+
+    private final List<EventHandler> handlers;
+
+    public EventProcessor(SmartHome smartHome) {
+         this.handlers = Arrays.asList(new DoorEventHandler(smartHome),
+                                       new LightEventHandler(smartHome),
+                                       new HallDoorEventHandler(smartHome));
+    }
+    public void process(SmartHome smartHome) {
         SensorEvent event = EventGetter.getNextSensorEvent();
+
         while (event != null) {
-            SmartHomeEventHandler.handleEvent(smartHome, event);
+
+            for (EventHandler handler : handlers) {
+                handler.handleEvent(event);
+            }
+
             event = EventGetter.getNextSensorEvent();
         }
     }
