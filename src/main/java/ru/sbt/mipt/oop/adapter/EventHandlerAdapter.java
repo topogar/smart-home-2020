@@ -6,28 +6,35 @@ import ru.sbt.mipt.oop.constants.SensorEventType;
 import ru.sbt.mipt.oop.handlers.EventHandler;
 import ru.sbt.mipt.oop.sensor.SensorEvent;
 
-public class EventHandlerAdapter implements com.coolcompany.smarthome.events.EventHandler {
-    private final EventHandler eventHandler;
-    private final SmartHome smartHome;
+import java.util.List;
+import java.util.Map;
 
-    public EventHandlerAdapter(SmartHome smartHome, EventHandler eventHandler) {
-        this.eventHandler = eventHandler;
-        this.smartHome = smartHome;
+public class EventHandlerAdapter implements com.coolcompany.smarthome.events.EventHandler {
+    private final List<EventHandler> handlers;
+    private final Map<String, SensorEventType> CCS2Sensor;
+
+    public EventHandlerAdapter(List<EventHandler> handlers, Map<String, SensorEventType> CCS2Sensor) {
+        this.handlers = handlers;
+        this.CCS2Sensor = CCS2Sensor;
+    }
+
+    private SensorEvent getSensorFromCCS(CCSensorEvent event) {
+        if (CCS2Sensor.containsKey(event.getEventType()))
+            return new SensorEvent(CCS2Sensor.get(event.getEventType()), event.getEventType());
+        else
+            return null;
     }
 
     @Override
     public void handleEvent(CCSensorEvent event) {
-        if (event.getEventType().equals("LightIsOn")) {
-            eventHandler.handleEvent(smartHome, new SensorEvent(SensorEventType.LIGHT_ON, event.getObjectId()));
+        SensorEvent sensorEvent = getSensorFromCCS(event);
+
+        if (sensorEvent == null) {
+            return;
         }
-        if (event.getEventType().equals("LightIsOff")) {
-            eventHandler.handleEvent(smartHome, new SensorEvent(SensorEventType.LIGHT_OFF, event.getObjectId()));
-        }
-        if (event.getEventType().equals("DoorIsOpen")) {
-            eventHandler.handleEvent(smartHome, new SensorEvent(SensorEventType.DOOR_OPEN, event.getObjectId()));
-        }
-        if (event.getEventType().equals("DoorIsClosed")) {
-            eventHandler.handleEvent(smartHome, new SensorEvent(SensorEventType.DOOR_CLOSED, event.getObjectId()));
+
+        for (EventHandler eventHandler : handlers) {
+            eventHandler.handleEvent(sensorEvent);
         }
     }
 }
