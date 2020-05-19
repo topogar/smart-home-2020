@@ -5,8 +5,15 @@ import ru.sbt.mipt.oop.constants.SensorEventType;
 import ru.sbt.mipt.oop.sensor.SensorEvent;
 
 public class SignalizationEventHandler implements EventHandler {
+
+    private final SmartHome smartHome;
+
+    public SignalizationEventHandler(SmartHome smartHome) {
+        this.smartHome = smartHome;
+    }
+
     @Override
-    public void handleEvent(SmartHome smartHome, SensorEvent event) {
+    public void handleEvent(SensorEvent event) {
         if (event.getType() == SensorEventType.ALARM_ACTIVATE) {
             smartHome.getSignalization().activate(event.getObjectId());
         }

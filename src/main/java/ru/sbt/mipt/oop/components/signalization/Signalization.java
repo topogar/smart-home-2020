@@ -1,12 +1,10 @@
 package ru.sbt.mipt.oop.components.signalization;
 
 public class Signalization {
-    private String code;
     private SignalizationState state;
 
     public Signalization() {
         this.state = new DeactivatedSignalizationState(this);
-        this.code = " ";
     }
 
     public void activate(String code) {
@@ -21,17 +19,12 @@ public class Signalization {
         state.toAlarmMode();
     }
 
-
     public void setState(SignalizationState state) {
         this.state = state;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getCode() {
-        return this.code;
+    public SignalizationState getState() {
+        return this.state;
     }
 
     public boolean isActivated() {

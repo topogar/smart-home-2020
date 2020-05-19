@@ -10,8 +10,7 @@ public class DeactivatedSignalizationState implements SignalizationState {
     @Override
     public void activate(String code) {
         System.out.println("Активирована");
-        signalization.setCode(code);
-        signalization.setState(new ActivatedSignalizationState(signalization));
+        signalization.setState(new ActivatedSignalizationState(signalization, code));
     }
 
     @Override

@@ -6,18 +6,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class RemoteController implements RemoteControl {
-    private Map<String, Command> commandsMap = new HashMap<>();
+    private final Map<String, Map<String, Command>> commandsMap;
 
-    public void set(String buttonCode, Command cmd) {
-        commandsMap.put(buttonCode, cmd);
-    }
-
-    public Command get(String buttonCode) {
-        return commandsMap.get(buttonCode);
+    public RemoteController(Map<String, Map<String, Command>> commandsMap) {
+        // изменил формат, перечитав задание
+        // id : code : command
+        this.commandsMap = commandsMap;
     }
 
     @Override
     public void onButtonPressed(String buttonCode, String rcId) {
-        commandsMap.get(buttonCode).execute();
+        if (commandsMap.containsKey(rcId) && commandsMap.get(rcId).containsKey(buttonCode)) {
+            commandsMap.get(rcId).get(buttonCode).execute();
+        }
     }
 }

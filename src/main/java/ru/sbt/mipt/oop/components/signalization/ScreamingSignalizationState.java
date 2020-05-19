@@ -2,9 +2,11 @@ package ru.sbt.mipt.oop.components.signalization;
 
 public class ScreamingSignalizationState implements SignalizationState {
     private final Signalization signalization;
+    private final String code;
 
-    public ScreamingSignalizationState(Signalization signalization) {
+    public ScreamingSignalizationState(Signalization signalization, String code) {
         this.signalization = signalization;
+        this.code = code;
     }
 
     @Override
@@ -14,11 +16,11 @@ public class ScreamingSignalizationState implements SignalizationState {
 
     @Override
     public void deactivate(String code) {
-        if (signalization.getCode().equals(code)) {
+        if (this.code.equals(code)) {
             signalization.setState(new DeactivatedSignalizationState(signalization));
             System.out.println("Deactivated");
         } else {
-           System.out.println("Введите другой код");
+            System.out.println("Введите другой код");
         }
     }
 

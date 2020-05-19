@@ -7,13 +7,15 @@ import java.util.List;
 
 public class SignalizationEventHandlerDecorator implements EventHandler {
 
+    private final SmartHome smartHome;
     private final List<EventHandler> eventHandlers;
 
-    public SignalizationEventHandlerDecorator(List<EventHandler> eventHandlers) {
+    public SignalizationEventHandlerDecorator(SmartHome smartHome, List<EventHandler> eventHandlers) {
+        this.smartHome = smartHome;
         this.eventHandlers = eventHandlers;
     }
 
-    public void handleEvent(SmartHome smartHome, SensorEvent event) {
+    public void handleEvent(SensorEvent event) {
 
         if (smartHome.getSignalization().isActivated()) {
             smartHome.getSignalization().toAlarmMode();
@@ -23,7 +25,7 @@ public class SignalizationEventHandlerDecorator implements EventHandler {
             System.out.println("sending sms");
         } else {
             for (EventHandler eventHandler : eventHandlers) {
-                eventHandler.handleEvent(smartHome, event);
+                eventHandler.handleEvent(event);
             }
         }
     }
