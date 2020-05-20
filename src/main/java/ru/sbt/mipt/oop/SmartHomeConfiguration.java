@@ -54,37 +54,29 @@ public class SmartHomeConfiguration {
     }
 
     @Bean
-    public EventHandler safetyHandler(SmartHome smartHome, List<EventHandler> eventHandlers) {
+    public SignalizationEventHandlerDecorator safetyHandler(SmartHome smartHome, List<EventHandler> eventHandlers) {
         return new SignalizationEventHandlerDecorator(smartHome, eventHandlers);
     }
 
     @Bean
-    public List<EventHandler> handlers(SmartHome smartHome) {
-        return Arrays.asList(doorEventHandler(smartHome),
-                lightEventHandler(smartHome),
-                hallDoorEventHandler(smartHome),
-                signalizationEventHandler(smartHome));
+    public Map<String, SensorEventType> CCTypes() {
+        HashMap<String, SensorEventType> map = new HashMap<>();
+        map.put("DoorIsOpen", SensorEventType.DOOR_OPEN);
+        map.put("DoorIsClosed", SensorEventType.DOOR_CLOSED);
+        map.put("LightIsOn", SensorEventType.LIGHT_ON);
+        map.put("LightIsOff", SensorEventType.LIGHT_OFF);
+        return map;
     }
 
     @Bean
-    public Map<String, SensorEventType> CCS2Sensor() {
-        return Stream.of(
-                new AbstractMap.SimpleImmutableEntry<>("DoorIsOpen", SensorEventType.DOOR_OPEN),
-                new AbstractMap.SimpleImmutableEntry<>("DoorIsClosed", SensorEventType.DOOR_CLOSED),
-                new AbstractMap.SimpleImmutableEntry<>("LightIsOn", SensorEventType.LIGHT_ON),
-                new AbstractMap.SimpleImmutableEntry<>("LightIsOff", SensorEventType.LIGHT_OFF))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+    public EventHandlerAdapter eventHandlerAdapter(SignalizationEventHandlerDecorator handler) {
+        return new EventHandlerAdapter(handler, CCTypes());
     }
 
     @Bean
-    public EventHandlerAdapter eventHandlerAdapter(List<EventHandler> handlers) {
-        return new EventHandlerAdapter(handlers, CCS2Sensor());
-    }
-
-    @Bean
-    public SensorEventsManager sensorEventsManager(SmartHome smartHome) {
+    public SensorEventsManager sensorEventsManager(SmartHome smartHome, List<EventHandler> eventHandlers) {
         SensorEventsManager sensorEventsManager = new SensorEventsManager();
-        sensorEventsManager.registerEventHandler(eventHandlerAdapter(handlers(smartHome)));
+        sensorEventsManager.registerEventHandler(eventHandlerAdapter(safetyHandler(smartHome, eventHandlers)));
         return sensorEventsManager;
     }
 
@@ -120,16 +112,15 @@ public class SmartHomeConfiguration {
 
     @Bean
     RemoteController remoteController(SmartHome smartHome) {
-
         Map<String, Map<String, Command>> map = new HashMap<>();
-        map.put("id", Stream.of(
-                new AbstractMap.SimpleImmutableEntry<>("A", activateAlarm(smartHome)),
-                new AbstractMap.SimpleImmutableEntry<>("B", activateSignalizationState(smartHome)),
-                new AbstractMap.SimpleImmutableEntry<>("C", closeHallDoor(smartHome)),
-                new AbstractMap.SimpleImmutableEntry<>("1", turnOffAllLight(smartHome)),
-                new AbstractMap.SimpleImmutableEntry<>("2", turnOnAllLight(smartHome)),
-                new AbstractMap.SimpleImmutableEntry<>("3", turnOnHallLight(smartHome)))
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue)));
+        map.put("id", new HashMap<String, Command>() {{
+                put("A", activateAlarm(smartHome));
+                put("B", activateSignalizationState(smartHome));
+                put("C", closeHallDoor(smartHome));
+                put("1", turnOffAllLight(smartHome));
+                put("2", turnOnAllLight(smartHome));
+                put("3", turnOnHallLight(smartHome));
+        }});
         return new RemoteController(map);
     }
     @Bean
