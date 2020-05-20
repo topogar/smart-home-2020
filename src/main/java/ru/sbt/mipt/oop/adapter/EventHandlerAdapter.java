@@ -10,31 +10,29 @@ import java.util.List;
 import java.util.Map;
 
 public class EventHandlerAdapter implements com.coolcompany.smarthome.events.EventHandler {
-    private final List<EventHandler> handlers;
-    private final Map<String, SensorEventType> CCS2Sensor;
+    private final EventHandler handler;
+    private final Map<String, SensorEventType> CCTypes;
 
-    public EventHandlerAdapter(List<EventHandler> handlers, Map<String, SensorEventType> CCS2Sensor) {
-        this.handlers = handlers;
-        this.CCS2Sensor = CCS2Sensor;
+    public EventHandlerAdapter(EventHandler eventHandler, Map<String, SensorEventType> CCTypes) {
+        this.handler = eventHandler;
+        this.CCTypes = CCTypes;
     }
 
-    private SensorEvent getSensorFromCCS(CCSensorEvent event) {
-        if (CCS2Sensor.containsKey(event.getEventType()))
-            return new SensorEvent(CCS2Sensor.get(event.getEventType()), event.getEventType());
+    private SensorEvent getSensorFromCC(CCSensorEvent event) {
+        if (CCTypes.containsKey(event.getEventType()))
+            return new SensorEvent(CCTypes.get(event.getEventType()), event.getEventType());
         else
             return null;
     }
 
     @Override
     public void handleEvent(CCSensorEvent event) {
-        SensorEvent sensorEvent = getSensorFromCCS(event);
+        SensorEvent sensorEvent = getSensorFromCC(event);
 
         if (sensorEvent == null) {
             return;
         }
 
-        for (EventHandler eventHandler : handlers) {
-            eventHandler.handleEvent(sensorEvent);
-        }
+        handler.handleEvent(sensorEvent);
     }
 }
