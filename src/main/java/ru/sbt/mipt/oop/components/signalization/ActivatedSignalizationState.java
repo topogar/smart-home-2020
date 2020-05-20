@@ -11,7 +11,7 @@ public class ActivatedSignalizationState implements SignalizationState {
 
     @Override
     public void activate(String code) {
-        toAlarmMode();
+        // ничего
     }
 
     @Override
