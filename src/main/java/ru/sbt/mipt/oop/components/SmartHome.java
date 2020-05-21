@@ -1,4 +1,6 @@
-package ru.sbt.mipt.oop;
+package ru.sbt.mipt.oop.components;
+
+import ru.sbt.mipt.oop.components.Room;
 
 import java.util.ArrayList;
 import java.util.Collection;
